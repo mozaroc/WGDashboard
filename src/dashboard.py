@@ -445,6 +445,24 @@ def get_conf_pub_key(config_name):
     except configparser.NoSectionError:
         return ""
 
+def get_wg_obf_by_name(config_name,obf_name):
+    """
+    Get public key for configuration.
+    @param config_name: Name of WG interface
+    @type config_name: str
+    @return: Return public key or empty string
+    @rtype: str
+    """
+
+    try:
+        conf = configparser.ConfigParser(strict=False)
+        conf.read(WG_CONF_PATH + "/" + config_name + ".conf")
+        pri = conf.get("Interface", obf_name)
+        conf.clear()
+        return pri.strip("\n")
+    except configparser.NoSectionError:
+        return ""
+
 
 def get_conf_listen_port(config_name):
     """
@@ -1166,7 +1184,7 @@ def add_peer_bulk(config_name):
     keys = data['keys']
     endpoint_allowed_ip = data['endpoint_allowed_ip']
     dns_addresses = data['DNS']
-    enable_preshared_key = data["enable_preshared_key"]
+    enable_preshared_key = True
     amount = data['amount']
     config_interface = read_conf_file_interface(config_name)
     if "Address" not in config_interface:
@@ -1234,7 +1252,7 @@ def add_peer(config_name):
     allowed_ips = data['allowed_ips']
     endpoint_allowed_ip = data['endpoint_allowed_ip']
     dns_addresses = data['DNS']
-    enable_preshared_key = data["enable_preshared_key"]
+    enable_preshared_key = True
     preshared_key = data['preshared_key']
     keys = get_conf_peer_key(config_name)
     if len(public_key) == 0 or len(dns_addresses) == 0 or len(allowed_ips) == 0 or len(endpoint_allowed_ip) == 0:
@@ -1434,9 +1452,29 @@ def generate_qrcode(config_name):
             endpoint_allowed_ip = peer[4]
             keepalive = peer[5]
             preshared_key = peer[6]
+            Jc = get_wg_obf_by_name(config_name,"Jc")
+            Jmin = get_wg_obf_by_name(config_name,"Jmin")
+            Jmax = get_wg_obf_by_name(config_name,"Jmax")
+            S1 = get_wg_obf_by_name(config_name,"S1")
+            S2 = get_wg_obf_by_name(config_name,"S2")
+            H1 = get_wg_obf_by_name(config_name,"H1")
+            H2 = get_wg_obf_by_name(config_name,"H2")
+            H3 = get_wg_obf_by_name(config_name,"H3")
+            H4 = get_wg_obf_by_name(config_name,"H4")
 
-            result = "[Interface]\nPrivateKey = " + private_key + "\nAddress = " + allowed_ip + "\nMTU = " \
-                     + str(mtu_value) + "\nDNS = " + dns_addresses + "\n\n[Peer]\nPublicKey = " + public_key \
+
+
+            result = "[Interface]\nPrivateKey = " + private_key + "\nAddress = " + allowed_ip + \
+                      "\nJc = " + Jc + \
+                      "\nJmin = " + Jmin + \
+                      "\nJmax = " + Jmax + \
+                      "\nS1 = " + S1 + \
+                      "\nS2 = " + S2 + \
+                      "\nH1 = " + H1 + \
+                      "\nH2 = " + H2 + \
+                      "\nH3 = " + H3 + \
+                      "\nH4 = " + H4 + \
+                     "\n\n[Peer]\nPublicKey = " + public_key \
                      + "\nAllowedIPs = " + endpoint_allowed_ip + "\nPersistentKeepalive = " \
                      + str(keepalive) + "\nEndpoint = " + endpoint
             if preshared_key != "":
@@ -1489,7 +1527,17 @@ def download_all(config_name):
             psk = "\nPresharedKey = " + preshared_key
 
         return_data = "[Interface]\nPrivateKey = " + private_key + "\nAddress = " + allowed_ip + "\nDNS = " + \
-                      dns_addresses + "\nMTU = " + str(mtu_value) + "\n\n[Peer]\nPublicKey = " + \
+                      dns_addresses + "\nMTU = " + str(mtu_value) + \
+                      "\nJc = " + Jc + \
+                      "\nJmin = " + Jmin + \
+                      "\nJmax = " + Jmax + \
+                      "\nS1 = " + S1 + \
+                      "\nS2 = " + S2 + \
+                      "\nH1 = " + H1 + \
+                      "\nH2 = " + H2 + \
+                      "\nH3 = " + H3 + \
+                      "\nH4 = " + H4 + \
+                      "\n\n[Peer]\nPublicKey = " + \
                       public_key + "\nAllowedIPs = " + endpoint_allowed_ip + "\nEndpoint = " + \
                       endpoint + "\nPersistentKeepalive = " + str(keepalive) + psk
         data.append({"filename": f"{filename}.conf", "content": return_data})
@@ -1523,6 +1571,15 @@ def download(config_name):
             keepalive = peer[5]
             preshared_key = peer[6]
             filename = peer[7]
+            Jc = get_wg_obf_by_name(config_name,"Jc")
+            Jmin = get_wg_obf_by_name(config_name,"Jmin")
+            Jmax = get_wg_obf_by_name(config_name,"Jmax")
+            S1 = get_wg_obf_by_name(config_name,"S1")
+            S2 = get_wg_obf_by_name(config_name,"S2")
+            H1 = get_wg_obf_by_name(config_name,"H1")
+            H2 = get_wg_obf_by_name(config_name,"H2")
+            H3 = get_wg_obf_by_name(config_name,"H3")
+            H4 = get_wg_obf_by_name(config_name,"H4")
             if len(filename) == 0:
                 filename = "Untitled_Peer"
             else:
@@ -1541,8 +1598,17 @@ def download(config_name):
             if preshared_key != "":
                 psk = "\nPresharedKey = " + preshared_key
 
-            return_data = "[Interface]\nPrivateKey = " + private_key + "\nAddress = " + allowed_ip + "\nDNS = " + \
-                          dns_addresses + "\nMTU = " + str(mtu_value) + "\n\n[Peer]\nPublicKey = " + \
+            return_data = "[Interface]\nPrivateKey = " + private_key + "\nAddress = " + allowed_ip +  \
+                          "\nJc = " + Jc + \
+                          "\nJmin = " + Jmin + \
+                          "\nJmax = " + Jmax + \
+                          "\nS1 = " + S1 + \
+                          "\nS2 = " + S2 + \
+                          "\nH1 = " + H1 + \
+                          "\nH2 = " + H2 + \
+                          "\nH3 = " + H3 + \
+                          "\nH4 = " + H4 + \
+                          "\n\n[Peer]\nPublicKey = " + \
                           public_key + "\nAllowedIPs = " + endpoint_allowed_ip + "\nEndpoint = " + \
                           endpoint + "\nPersistentKeepalive = " + str(keepalive) + psk
 

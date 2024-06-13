@@ -143,13 +143,12 @@
                                     value="{{ keep_alive }}">
                             </div>
                         </div>
-                        <div class="col-sm">
+                      <div class="col-sm">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="enable_preshare_key"
-                                    name="enable_preshare_key" value="enable_psk">
-                                <label class="form-check-label" for="enable_preshare_key">Use Pre-shared Key</label>
+                                <input class="form-check-input" type="hidden" id="enable_preshare_key" name="enable_preshare_key" value="enable_psk" visible="false" >
+                             <!--   <label class="form-check-label" type="hidden" for="enable_preshare_key">Use Pre-shared Key</label> -->
                             </div>
-                        </div>
+                        </div> 
                     </div>
                 </form>
             </div>

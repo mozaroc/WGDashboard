@@ -9,35 +9,37 @@ Tested only with Ubuntu 22.04
 #### Install AmneziaWG kernel module
 
 1. Upgrade your system to latest packages including latest available kernel by running 
-  apt-get full-upgrade 
+ ```  apt-get full-upgrade ``` 
 After kernel upgrade reboot is required.
-2. Ensure that you have source repositories configured for APT - run vi /etc/apt/sources.list and make sure that there is at least one line starting with deb-src is present and uncommented.
+2. Ensure that you have source repositories configured for APT - edit /etc/apt/sources.list and make sure that there is at least one line starting with deb-src is present and uncommented.
 3. Install pre-requisites - run 
-   sudo apt install -y software-properties-common python3-launchpadlib gnupg2 linux-headers-$(uname -r)
+   ```sudo apt install -y software-properties-common python3-launchpadlib gnupg2 linux-headers-$(uname -r)```
 4. reboot
-5. sudo add-apt-repository ppa:amnezia/ppa
-6. sudo apt-get install -y amneziawg.
+5. ```sudo add-apt-repository ppa:amnezia/ppa```
+6. ```sudo apt-get install -y amneziawg ```
 7. Create simlinks from awg and awg-quick to wg and wg-quick
+```
    ln -s /usr/bin/awg /usr/bin/wg
    ln -s /usr/bin/awg-quick /usr/bin/wg-quick
-   
+```
+9. reboot   
 
 #### Install WGDashboard
 
 1. Install pip
-   apt -y install python3-pip
+   ```apt -y install python3-pip```
 2. Install pre-requisites
-   pip install gunicorn ifcfg flask flask_qrcode icmplib
+   ```pip install gunicorn ifcfg flask flask_qrcode icmplib```
 3. Clone and install WGDashboard
-   cd /
-4. git clone https://github.com/mozaroc/WGDashboard.git wgdashboard
-5. cd /wgdashboard/src
-6. chmod u+x wgd.sh
-7. ./wgd.sh install
+   ```cd /```
+4. ```git clone https://github.com/mozaroc/WGDashboard.git wgdashboard```
+5. ```cd /wgdashboard/src```
+6. ```chmod u+x wgd.sh```
+7. ```./wgd.sh install```
 8. Configure awg server interface 
-   cd /wgdashboard
-9. chmod u+x awg-gen-config.sh
-10. ./awg-gen-config.sh
+   ```cd /wgdashboard```
+9. ```chmod u+x awg-gen-config.sh```
+10. ``` ./awg-gen-config.sh ```
 11.  Create wg-dash systemd unit
    ```
 cat << EOF | sudo tee "/etc/systemd/system/wg-dash.service"
@@ -59,34 +61,6 @@ WantedBy=multi-user.target
 
 EOF
 ```
-12. Create WGsashboard config
-```
-cat << EOF | sudo tee "/wgdashboard/src/wg-dashboard.ini"
-[Account]
-username = admin
-password = 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
-
-[Server]
-wg_conf_path = /etc/wireguard
-app_ip = MAIN_IP_OF_YOUR_SERVER
-app_port = 10085
-auth_req = true
-version = v3.1
-dashboard_refresh_interval = 60000
-dashboard_sort = status
-dashboard_theme = light
-
-[Peers]
-peer_global_dns = 1.1.1.1
-peer_endpoint_allowed_ip = 0.0.0.0/0
-peer_display_mode = grid
-remote_endpoint = MAIN_IP_OF_YOUR_SERVER
-peer_mtu = 1342
-peer_keep_alive = 21
-
-EOF
-
-```
 #### Configure firewall
 
 ```
@@ -107,20 +81,27 @@ ufw allow 52853/udp
    set -   DEFAULT_FORWARD_POLICY="ACCEPT"
 
 5. Add NAT rules for awg clients
-   edit /etc/ufw/before.rules
+   edit /etc/ufw/after.rules
    add all lines to the start of document:
    
-   # NAT table rules
-   *nat
-    :POSTROUTING ACCEPT [0:0]
+# NAT table rules
+*nat
+:POSTROUTING ACCEPT [0:0]
 
-   # Forward traffic through eth0 - Change to match you out-interface
-   -A POSTROUTING -s 10.90.90.0/24 -o eth0 -j MASQUERADE
+# Forward traffic through eth0 - Change to match you out-interface
+-A POSTROUTING -s 10.90.90.0/24 -o eth0 -j MASQUERADE
 
-   # don't delete the 'COMMIT' line or these nat table rules won't
-   # be processed
-   COMMIT
+# don't delete the 'COMMIT' line or these nat table rules won't
+# be processed
+COMMIT
 ```
+
+restart firewall
+
+```
+ufw allow 22/tcp
+ufw disable
+ufw enable
 
 start awg interface
 
@@ -132,7 +113,7 @@ start WGDashboard
 
 ```
 systemctl daemon-reload
-systemctl enable wg-dash --network
+systemctl enable wg-dash --now
 ```
 
 

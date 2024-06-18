@@ -102,7 +102,7 @@ restart firewall
 ufw allow 22/tcp
 ufw disable
 ufw enable
-
+```
 start awg interface
 
 ```

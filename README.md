@@ -63,19 +63,19 @@ EOF
 ```
 #### Configure firewall
 
-```
+
 1. Allow panel port(see app_port in /wgdashboard/src/wg-dashboard.ini)
-ufw allow 10085/tcp
+```ufw allow 10085/tcp```
 2. Allow awg server port (see ListenPort in /etc/amnezia/amneziawg/wg0.conf)
-ufw allow 52853/udp
+```ufw allow 52853/udp```
 3. Enable routing
    edit  /etc/ufw/sysctl.conf
    uncomment three lines:
-
+```
    net/ipv4/ip_forward=1
    net/ipv6/conf/default/forwarding=1
    net/ipv6/conf/all/forwarding=1
-
+```
 4. Set default policy for forwarding
    edit /etc/default/ufw
    set -   DEFAULT_FORWARD_POLICY="ACCEPT"
@@ -83,7 +83,7 @@ ufw allow 52853/udp
 5. Add NAT rules for awg clients
    edit /etc/ufw/after.rules
    add all lines to the start of document:
-   
+```   
 # NAT table rules
 *nat
 :POSTROUTING ACCEPT [0:0]

@@ -14,12 +14,13 @@ After kernel upgrade reboot is required.
 2. Ensure that you have source repositories configured for APT - run vi /etc/apt/sources.list and make sure that there is at least one line starting with deb-src is present and uncommented.
 3. Install pre-requisites - run 
    sudo apt install -y software-properties-common python3-launchpadlib gnupg2 linux-headers-$(uname -r)
-4. sudo add-apt-repository ppa:amnezia/ppa
-5. sudo apt-get install -y amneziawg.
-6. Create simlinks from awg and awg-quick to wg and wg-quick
+4. reboot
+5. sudo add-apt-repository ppa:amnezia/ppa
+6. sudo apt-get install -y amneziawg.
+7. Create simlinks from awg and awg-quick to wg and wg-quick
    ln -s /usr/bin/awg /usr/bin/wg
    ln -s /usr/bin/awg-quick /usr/bin/wg-quick
-7. reboot
+   
 
 #### Install WGDashboard
 

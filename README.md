@@ -45,7 +45,7 @@ After kernel upgrade reboot is required.
 cat << EOF | sudo tee "/etc/systemd/system/wg-dash.service"
 [Unit]
 After=syslog.target network-online.target
-ConditionPathIsDirectory=/etc/wireguard
+ConditionPathIsDirectory=/etc/amnezia/amneziawg
 [Service]
 Type=forking
 User=root

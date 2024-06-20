@@ -106,7 +106,7 @@ ufw enable
 start awg interface
 
 ```
-awg-quic up wg0
+awg-quick up wg0
 ```
 
 start WGDashboard
